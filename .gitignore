@@ -1,0 +1,19 @@
+# Secrets — never commit
+deploy/.env
+*.env
+.env*
+!.env.example
+
+# Rust
+rust/target/
+**/*.rs.bk
+
+# Go
+go/tunnel-svc
+go/bin/
+*.test
+*.out
+
+# OS / editor
+.DS_Store
+*.swp

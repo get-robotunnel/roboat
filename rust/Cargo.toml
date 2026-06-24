@@ -1,0 +1,14 @@
+[workspace]
+members = ["crates/rt-core", "crates/rt-webrtc"]
+resolver = "2"
+
+# rt-webrtc depends on a vendored fork of webrtc-ice (ICE candidate gathering
+# fixes for Docker/VPN/Tailscale LANs). Consumers of these crates must apply the
+# same patch in their own workspace.
+[patch.crates-io]
+webrtc-ice = { path = "vendor/webrtc-ice" }
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "s"

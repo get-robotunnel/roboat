@@ -1,0 +1,46 @@
+name: Deploy Tunnel
+
+on:
+  workflow_dispatch:
+    inputs:
+      goarch:
+        description: "Target VPS architecture"
+        type: choice
+        options: [amd64, arm64]
+        default: amd64
+
+# SSH credentials live in the `production` environment secrets (shared with the
+# ops + registry deploy workflows):
+#   PROD_SSH_HOST, PROD_SSH_PORT, PROD_SSH_USER, PROD_SSH_PRIVATE_KEY, PROD_SSH_KNOWN_HOSTS
+# The workflow uploads the binary + unit + setup.sh and runs setup.sh on the VPS.
+# It never touches /opt/robotunnel-tunnel/config/.env, and never modifies the
+# api.robotunnel.io cutover strangler (that is a staged manual step).
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build binary
+        working-directory: go
+        run: GOOS=linux GOARCH=${{ inputs.goarch }} CGO_ENABLED=0 go build -o tunnel-svc ./cmd/tunnel-svc
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          echo "${{ secrets.PROD_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Upload + install
+        env:
+          H: ${{ secrets.PROD_SSH_HOST }}
+          P: ${{ secrets.PROD_SSH_PORT }}
+          U: ${{ secrets.PROD_SSH_USER }}
+        run: |
+          scp -i ~/.ssh/id_deploy -P "$P" go/tunnel-svc deploy/tunnel.service deploy/setup.sh "$U@$H:/tmp/"
+          ssh -i ~/.ssh/id_deploy -p "$P" "$U@$H" 'cd /tmp && chmod +x setup.sh && sudo ./setup.sh'

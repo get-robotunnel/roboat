@@ -1,0 +1,42 @@
+# RoboTunnel Tunnel — Caddy configuration.
+#
+# Part A (always safe): the canonical public hostname for the tunnel service.
+# New agent builds default to this. Append to the VPS Caddyfile; Caddy obtains
+# TLS for tunnel.robotunnel.io automatically.
+
+tunnel.robotunnel.io {
+	reverse_proxy 127.0.0.1:8091
+}
+
+# ---------------------------------------------------------------------------
+# Part B (zero-downtime cutover STRANGLER): route the connection path-prefixes
+# on the EXISTING api.robotunnel.io vhost to tunnel-svc (:8091), leaving ops
+# business endpoints on the platform (:8080). Already-deployed agents keep the
+# same hostname and cut over with no client change. Rollback = remove the
+# @tunnel matcher/route below and reload Caddy.
+#
+# Apply this by editing the api.robotunnel.io block in the VPS Caddyfile so it
+# looks like the following. ENABLE PATHS INCREMENTALLY as each piece is migrated
+# and the matching ops internal endpoints exist:
+#   - Phase 1 (signaling + TURN extracted): /api/signal/*, /api/turn-credentials*
+#   - Phase 2 (CP/DP relay extracted): add the remaining prefixes.
+#
+# api.robotunnel.io {
+#     encode zstd gzip
+#
+#     @tunnel path /api/signal/* /api/turn-credentials*
+#                  # Phase 2: /api/agent/connect* /api/agent/relay* /v1/agent/* \
+#                  #          /api/relay/ws* /api/heartbeat* \
+#                  #          /api/agent-auth-public-key* /api/agent/authorized-keys*
+#     reverse_proxy @tunnel 127.0.0.1:8091 {
+#         header_up Host {host}
+#         header_up X-Forwarded-Host {host}
+#         header_up X-Forwarded-Proto {scheme}
+#     }
+#
+#     reverse_proxy 127.0.0.1:8080 {
+#         header_up Host {host}
+#         header_up X-Forwarded-Host {host}
+#         header_up X-Forwarded-Proto {scheme}
+#     }
+# }
