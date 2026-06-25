@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.robotunnel.robotunneld</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/robotunneld</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>RT_DAEMON_SOCKET</key>
+        <string>/var/run/robotunnel/rt.sock</string>
+        <key>RT_DAEMON_LISTEN_PORT</key>
+        <string>11411</string>
+        <key>RT_DAEMON_INSECURE</key>
+        <string>false</string>
+        <key>RUST_LOG</key>
+        <string>info</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/var/log/robotunneld.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/var/log/robotunneld.log</string>
+
+    <!-- Create socket directory before launch -->
+    <key>UserName</key>
+    <string>root</string>
+
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+</dict>
+</plist>

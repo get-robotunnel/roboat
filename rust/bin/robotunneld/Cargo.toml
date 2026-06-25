@@ -1,0 +1,18 @@
+[package]
+name = "robotunneld"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/get-robotunnel/robot-agent-tunnel"
+description = "RoboTunnel daemon binary"
+
+[[bin]]
+name = "robotunneld"
+path = "src/main.rs"
+
+[dependencies]
+rt-daemon = { path = "../../crates/rt-daemon" }
+rt-core = { path = "../../crates/rt-core" }
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
