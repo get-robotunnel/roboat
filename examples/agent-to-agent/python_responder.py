@@ -16,7 +16,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../clients/python"))
 
-from rt_connect import Daemon
+from roboat import Daemon
 
 
 async def main():

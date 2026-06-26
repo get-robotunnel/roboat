@@ -15,7 +15,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/get-robotunnel/robot-agent-tunnel/clients/go/rtconnect"
+	"github.com/get-robotunnel/roboat/clients/go/roboat"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		target = os.Args[1]
 	}
 
-	rt, err := rtconnect.NewDaemon(socketPath)
+	rt, err := roboat.NewDaemon(socketPath)
 	if err != nil {
 		log.Fatalf("initiator: connect to daemon: %v", err)
 	}

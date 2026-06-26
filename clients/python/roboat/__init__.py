@@ -1,4 +1,4 @@
-"""rt-connect — RoboTunnel thin client for Python agents."""
+"""roboat — RoboTunnel thin client for Python agents."""
 
 from .daemon import Daemon, Stream
 from .ipc_types import StreamClass

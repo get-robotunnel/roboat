@@ -1,15 +1,15 @@
-// Package rtconnect provides a thin Go client for the robotunneld local IPC socket.
+// Package roboat provides a thin Go client for the robotunneld local IPC socket.
 //
 // Frame format: [uint32 big-endian length][JSON bytes]
 // Binary data is base64-encoded within JSON payloads.
 //
 // Usage:
 //
-//	rt, err := rtconnect.NewDaemon("/var/run/robotunnel/rt.sock")
+//	rt, err := roboat.NewDaemon("/var/run/robotunnel/rt.sock")
 //	stream, err := rt.Dial("127.0.0.1:11411", "control")
 //	stream.Send([]byte("hello"))
 //	data, err := stream.Recv()
-package rtconnect
+package roboat
 
 import (
 	"context"
@@ -59,7 +59,7 @@ func NewDaemon(socketPath string) (*Daemon, error) {
 	}
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
-		return nil, fmt.Errorf("rtconnect: connect to daemon: %w", err)
+		return nil, fmt.Errorf("roboat: connect to daemon: %w", err)
 	}
 	d := &Daemon{
 		conn:     conn,
@@ -80,28 +80,25 @@ func (d *Daemon) Listen(agentID string, registryToken string) error {
 	if err := d.writeMsg(msg); err != nil {
 		return err
 	}
-	// Read direct response (listening or error) — the recv loop is running so
-	// we need to read from it. Use a one-shot channel.
 	resp, err := d.readOnce()
 	if err != nil {
 		return err
 	}
 	if resp["op"] == "error" {
-		return fmt.Errorf("rtconnect: listen: %v", resp["message"])
+		return fmt.Errorf("roboat: listen: %v", resp["message"])
 	}
 	if resp["op"] != "listening" {
-		return fmt.Errorf("rtconnect: unexpected response: %v", resp["op"])
+		return fmt.Errorf("roboat: unexpected response: %v", resp["op"])
 	}
 	return nil
 }
 
 // Incoming returns a channel on which new inbound streams arrive.
-// Use with context cancellation to stop waiting.
 func (d *Daemon) Incoming(ctx context.Context) (<-chan *Stream, error) {
 	return d.incoming, nil
 }
 
-// Dial connects to a remote agent. In Phase A, targetAgentID is "host:port".
+// Dial connects to a remote agent. targetAgentID is "agt_xxx" or "host:port".
 func (d *Daemon) Dial(targetAgentID string, streamClass string) (*Stream, error) {
 	if streamClass == "" {
 		streamClass = "control"
@@ -185,7 +182,7 @@ func (d *Daemon) readMsg() (map[string]any, error) {
 	}
 	length := binary.BigEndian.Uint32(header)
 	if length > maxMsgSize {
-		return nil, fmt.Errorf("rtconnect: message too large: %d", length)
+		return nil, fmt.Errorf("roboat: message too large: %d", length)
 	}
 	buf := make([]byte, length)
 	if _, err := io.ReadFull(d.conn, buf); err != nil {

@@ -97,7 +97,6 @@ class Daemon:
         if tunnel_endpoint:
             msg["tunnel_endpoint"] = tunnel_endpoint
         await self._send_msg(msg)
-        # Wait for the `listening` confirmation
         resp = await self._read_msg()
         if resp.get("op") == "error":
             raise RuntimeError(f"listen failed: {resp.get('message')}")
@@ -209,8 +208,5 @@ class Daemon:
             if fut and not fut.done():
                 fut.set_exception(RuntimeError(msg.get("message", "unknown error")))
 
-        elif op == "listening":
-            pass  # handled by listen() caller via direct read
-
-        elif op == "pong":
+        elif op in ("listening", "pong"):
             pass

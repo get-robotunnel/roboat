@@ -52,7 +52,7 @@ Default TCP port: `11411`
 **Python**
 ```python
 import asyncio
-from rt_connect import Daemon
+from roboat import Daemon
 
 async def main():
     async with Daemon() as rt:
@@ -70,7 +70,7 @@ asyncio.run(main())
 
 **Go**
 ```go
-rt, _ := rtconnect.NewDaemon("")
+rt, _ := roboat.NewDaemon("")
 rt.Listen("agt_A", "")
 
 for stream := range rt.Incoming() {
@@ -104,8 +104,8 @@ rust/
   crates/rt-webrtc     WebRTC path (STUN/TURN)
   bin/robotunneld      Daemon binary
 clients/
-  python/rt_connect    Async Python client (pip install rt-connect)
-  go/rtconnect         Go client module
+  python/roboat        Async Python client (pip install roboat)
+  go/roboat            Go client module
 examples/
   agent-to-agent/      Python responder + Go initiator demo
 deploy/

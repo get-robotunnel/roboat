@@ -17,15 +17,15 @@ Each library does exactly one thing: encode/decode the
 
 | Language | Directory | Package |
 |----------|-----------|---------|
-| Python ≥ 3.10 | `python/` | `rt-connect` (zero dependencies) |
-| Go ≥ 1.22 | `go/` | `rtconnect` (stdlib only) |
+| Python ≥ 3.10 | `python/` | `roboat` (zero dependencies) |
+| Go ≥ 1.22 | `go/` | `roboat` (stdlib only) |
 
 ## Quick start
 
 ### Python
 
 ```python
-from rt_connect import Daemon
+from roboat import Daemon
 
 # Responder
 async with Daemon() as rt:
@@ -44,7 +44,7 @@ async with Daemon() as rt:
 ### Go
 
 ```go
-rt, _ := rtconnect.NewDaemon("")
+rt, _ := roboat.NewDaemon("")
 defer rt.Close()
 
 // Initiator

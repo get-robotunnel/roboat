@@ -1,3 +1,3 @@
-module github.com/get-robotunnel/robot-agent-tunnel/clients/go
+module github.com/get-robotunnel/roboat/clients/go
 
 go 1.22
